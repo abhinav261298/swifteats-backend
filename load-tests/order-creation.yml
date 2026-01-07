@@ -1,0 +1,27 @@
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 60
+      arrivalRate: 8  # 500 orders per minute or 8.33 orders per second
+      name: "Order creation load"
+  processor: "./helpers.js"
+  variables:
+    customerToken: "{{ $env.CUSTOMER_TOKEN }}"
+    
+scenarios:
+  - name: "Create order"
+    flow:
+      - function: "generateOrderData"
+      - log: "Order data: restaurant={{ restaurantId }}, address={{ deliveryAddressId }}, item={{ menuItemId }}, qty={{ quantity }}, payment={{ paymentMethod }}"
+      - post:
+          url: "/api/v1/orders"
+          headers:
+            Authorization: "Bearer {{ customerToken }}"
+          json:
+            restaurantId: "{{ restaurantId }}"
+            deliveryAddressId: "{{ deliveryAddressId }}"
+            items:
+              - menuItemId: "{{ menuItemId }}"
+                quantity: "{{ quantity }}"
+            paymentMethod: "{{ paymentMethod }}"
+      - think: 5

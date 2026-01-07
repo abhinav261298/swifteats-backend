@@ -1,0 +1,23 @@
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 60
+      arrivalRate: 50  # 50 requests per second
+      name: "Sustained load"
+  processor: "./helpers.js"
+  
+scenarios:
+  - name: "Browse restaurant menu"
+    flow:
+      - get:
+          url: "/api/v1/restaurants"
+          qs:
+            latitude: 19.0760
+            longitude: 72.8777
+            radius: 5
+          capture:
+            - json: "$[0].id"
+              as: "restaurantId"
+      - get:
+          url: "/api/v1/restaurants/{{ restaurantId }}/menu"
+      - think: 2

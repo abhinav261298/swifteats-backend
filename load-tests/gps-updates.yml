@@ -1,0 +1,26 @@
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 60
+      arrivalRate: 10  # 10 events per second
+      name: "GPS updates"
+  processor: "./helpers.js"
+  variables:
+    driverToken: "{{ $env.DRIVER_TOKEN }}"
+    
+scenarios:
+  - name: "Send GPS location"
+    flow:
+      - function: "generateRandomCoords"
+      - post:
+          url: "/api/v1/driver/location"
+          headers:
+            Authorization: "Bearer {{ driverToken }}"
+            Content-Type: "application/json"
+          json:
+            latitude: "{{ latitude }}"
+            longitude: "{{ longitude }}"
+            accuracy: "{{ accuracy }}"
+            heading: "{{ heading }}"
+            speed: "{{ speed }}"
+      - think: 0.1
