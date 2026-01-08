@@ -1,5 +1,6 @@
 import dataSource from '../data-source';
 import { User } from '../../modules/user/entities/user.entity';
+import { Address } from '../../modules/user/entities/address.entity';
 import { Restaurant } from '../../modules/restaurant/entities/restaurant.entity';
 import { MenuItem } from '../../modules/restaurant/entities/menu-item.entity';
 import { Driver } from '../../modules/driver/entities/driver.entity';
@@ -14,6 +15,7 @@ async function seed() {
     console.log('✅ Database connection established');
 
     const userRepo = dataSource.getRepository(User);
+    const addressRepo = dataSource.getRepository(Address);
     const restaurantRepo = dataSource.getRepository(Restaurant);
     const menuItemRepo = dataSource.getRepository(MenuItem);
     const driverRepo = dataSource.getRepository(Driver);
@@ -68,6 +70,38 @@ async function seed() {
       role: UserRole.CUSTOMER,
     });
     await userRepo.save([customer1, customer2]);
+
+    // Seed Addresses for Customers
+    try {
+      console.log('📍 Creating customer addresses...');
+      const address1 = addressRepo.create({
+        userId: customer1.id,
+        label: 'Home',
+        street: '101 Andheri West, Near Metro Station',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        postalCode: '400058',
+        latitude: 19.1334,
+        longitude: 72.8667,
+        isDefault: true,
+      });
+      const address2 = addressRepo.create({
+        userId: customer2.id,
+        label: 'Home',
+        street: '202 Bandra Kurla Complex',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        postalCode: '400051',
+        latitude: 19.0596,
+        longitude: 72.8656,
+        isDefault: true,
+      });
+      await addressRepo.save([address1, address2]);
+      console.log('✅ Addresses created successfully');
+    } catch (error) {
+      console.error('❌ Failed to create addresses:', error.message);
+      throw error;
+    }
 
     // Seed Restaurant Owners
     console.log('🏪 Creating restaurant owners...');
@@ -281,6 +315,7 @@ async function seed() {
     console.log('\n📊 Summary:');
     console.log(`   - Admin users: 1`);
     console.log(`   - Customers: 2`);
+    console.log(`   - Customer addresses: 2`);
     console.log(`   - Restaurant owners: 2`);
     console.log(`   - Restaurants: 2`);
     console.log(`   - Menu items: ${menuItems1.length + menuItems2.length}`);

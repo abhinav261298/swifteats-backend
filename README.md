@@ -773,6 +773,12 @@ curl -X POST http://localhost:4000/api/v1/auth/login \
 # Swagger: http://localhost:4000/api
 # pgAdmin: http://localhost:5050 (admin@swifteats.com / admin123)
 
+# 🔄 Important: When Making Code Changes
+# The Docker container has the compiled code baked into the image.
+# After modifying TypeScript code, you must rebuild the image:
+docker compose up -d --build app
+# Then re-run migrations/seeds if needed
+
 # 9. Connect to database via pgAdmin
 # Host: postgres, Port: 5432, Database: swifteats
 # Username: swifteats_user, Password: secure_password
